@@ -569,7 +569,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try{
                     Log.d("serverThread", "thread running");
-                    Thread.sleep(1000);
+                    //Thread.sleep(1000);
                     serverSocket = new ServerSocket(port, backlog);
                     //ServerSocket serverSocket = new ServerSocket();
                     while (true) {
@@ -580,37 +580,21 @@ public class MainActivity extends AppCompatActivity {
 
                         Log.d("serverThread", "server waiting to accept on " + serverSocket.toString());
                         Socket clientSocket = serverSocket.accept();
-                        DataOutputStream out = new DataOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
                         DataInputStream in = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
-                        byte[] buffer = new byte[4096];
-                        int read;
-                        int totalRead = 0;
-                        ContentValues values = new ContentValues();
 
-                        values.put(MediaStore.MediaColumns.DISPLAY_NAME, "nanFile");       //file name
-                        values.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");        //file extension, will automatically add to file
-                        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS );     //end "/" is not mandatory
+                        int count = in.available();
 
-                        Uri uri = getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);      //important!
+                        byte[] bs = new byte[count];
 
-                        OutputStream fos = getContentResolver().openOutputStream(uri);
-                        //FileOutputStream fos = new FileOutputStream("/sdcard/Download/newfile");
-                        Log.d("serverThread", "Socket being written to begin... ");
-                        while ((read = in.read(buffer)) > 0) {
-                            fos.write(buffer,0,read);
-                            totalRead += read;
-                            if (totalRead%(4096*2500)==0) {//every 10MB update status
-                                Log.d("clientThread", "total bytes retrieved:" + totalRead);
-                            }
-                        }
-                        Log.d("serverThread", "finished file transfer: " + totalRead);
+                        in.read(bs);
+
+                        Log.d("serverThread", "finished file transfer: " + new String(bs));
+
 
                     }
                 } catch (IOException e) {
                     Log.d("serverThread", "socket exception " + e.toString());
                     Log.d("serverThread",  e.getStackTrace().toString());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         };
