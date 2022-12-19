@@ -80,8 +80,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupPermissions();
-
-        String  status  = null;
+        wifiAware = new WifiAware(this);
 
 
     }
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         String  status = null;
         Log.d(TAG, "Current phone build" + Build.VERSION.SDK_INT +"\tMinimum:"+ Build.VERSION_CODES.O);
         Log.d(TAG,"Supported Aware: " + getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE));
-
+        wifiAware.startManager();
 
     }
 

@@ -30,16 +30,21 @@ import java.util.List;
 
 public class Subscription {
 
+    interface Subscribed {
+        void messageReceived(String message);
+    }
+
     SubscribeDiscoverySession subscribeDiscoverySession;
     WifiAwareSession wifiAwareSession;
-
-    public Subscription(WifiAwareSession wifiAwareSession){
-        this.wifiAwareSession = wifiAwareSession;
+    private final int                 MAC_ADDRESS_MESSAGE             = 55;
+    private Subscribed subs;
+    public Subscription(Subscribed subs){
+        this.subs = subs;
     }
     //-------------------------------------------------------------------------------------------- +++++
     @TargetApi(26)
-    public void subscribeToService() {
-
+    public void subscribeToService(WifiAwareSession wifiAwareSession) {
+        this.wifiAwareSession = wifiAwareSession;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) { return; }
 
         SubscribeConfig config = new SubscribeConfig.Builder()
@@ -62,15 +67,16 @@ public class Subscription {
                 super.onServiceDiscovered(peerHandle, serviceSpecificInfo, matchFilter);
                 //peerHandle = peerHandle_;
                 Log.d("subscribeToService", "onServiceDiscovered");
-               // if(!networkBuilt)subscribeDiscoverySession.sendMessage(peerHandle,MAC_ADDRESS_MESSAGE,myMac);
+               // if(!networkBuilt)
+                subscribeDiscoverySession.sendMessage(peerHandle,MAC_ADDRESS_MESSAGE,null);
             }
 
 
             @Override
             public void onMessageReceived(PeerHandle peerHandle, byte[] message) {
                 super.onMessageReceived(peerHandle, message);
-                Log.d("subscribeToService", "received message "+message.length);
-
+                //Log.d("subscribeToService", "received message "+message.length);
+                subs.messageReceived("Message received "+message.length);
             }
         }, null);
     }

@@ -15,7 +15,7 @@ import android.net.wifi.aware.WifiAwareSession;
 import android.os.Build;
 import android.util.Log;
 
-public class WifiAware {
+public class WifiAware implements Subscription.Subscribed, Publication.Published {
 
     private static final String TAG="WifiAware";
     private BroadcastReceiver broadcastReceiver;
@@ -24,12 +24,16 @@ public class WifiAware {
     private WifiAwareSession wifiAwareSession;
     private NetworkSpecifier networkSpecifier;
     private Context context;
+    private Subscription sub;
+    private Publication pub;
 
     public WifiAware(Context context){
         wifiAwareManager = null;
         wifiAwareSession = null;
         networkSpecifier = null;
         connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        sub = new Subscription(this);
+        pub = new Publication(this);
         this.context = context;
     }
 
@@ -124,10 +128,7 @@ public class WifiAware {
                 closeSession();
                 wifiAwareSession = session;
                 //setHaveSession(true);
-                Publication pub = new Publication(wifiAwareSession);
-                pub.publishService();
-                Subscription sub = new Subscription(wifiAwareSession);
-                sub.subscribeToService();
+                startDiscovery(wifiAwareSession);
             }
 
             @Override
@@ -148,11 +149,14 @@ public class WifiAware {
     }
 
 
-    public void startDiscovery(){
-
+    public void startDiscovery(WifiAwareSession session){
+        pub.closeSession();
+        sub.closeSession();
+        pub.publishService(session);
+        sub.subscribeToService(session);
     }
 
-    public void startNetwork(){
+    public void requestNetwork(){
 
     }
 
@@ -167,4 +171,10 @@ public class WifiAware {
             wifiAwareSession = null;
         }
     }
+
+    @Override
+    public void messageReceived(String message) {
+        Log.d(TAG,message);
+    }
+
 }
