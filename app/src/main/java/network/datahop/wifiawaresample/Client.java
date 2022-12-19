@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 public class Client {
 
 
-    public void clientSendFile(final Inet6Address serverIP, final int serverPort) {
+    public static void clientSendFile(final Inet6Address serverIP, final int serverPort) {
         Runnable clientTask = new Runnable() {
             @Override
             public void run() {

@@ -66,6 +66,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -114,7 +115,9 @@ public class MainActivity extends AppCompatActivity {
         String  status = null;
         Log.d(TAG, "Current phone build" + Build.VERSION.SDK_INT +"\tMinimum:"+ Build.VERSION_CODES.O);
         Log.d(TAG,"Supported Aware: " + getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE));
-        wifiAware.startManager();
+        String peerId="user1";
+        int port=4563;
+        wifiAware.startManager(peerId,port,generateRandomStatus().getBytes(StandardCharsets.UTF_8));
 
     }
 
@@ -130,6 +133,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopSession(){
 
+    }
+
+    public String generateRandomStatus() {
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+        Random random = new Random();
+
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return generatedString;
     }
 
 }
